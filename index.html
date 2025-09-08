@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Heart space</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: rgb(7, 0, 37);
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let width, height, heartScale;
+const stars = [];
+let heartStars = [];
+const fallingTexts = [];
+
+// Công thức trái tim
+function heartShape(t, scale = 1) {
+  const x = 16 * Math.pow(Math.sin(t), 3);
+  const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+  return { x: x * scale, y: y * scale };
+}
+
+// Hàm resize lại canvas và tái tạo sao/trái tim
+function resizeCanvas() {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+  heartScale = Math.min(width, height) / 3 * 0.04;
+
+  // reset sao nền
+  stars.length = 0;
+  for (let i = 0; i < 300; i++) {
+    stars.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 2,
+      alpha: Math.random(),
+      speed: 0.01 + Math.random() * 0.001 // ⭐ tốc độ nhấp nháy (chỉnh chỗ này)
+    });
+  }
+
+  // reset sao trái tim
+  heartStars = [];
+  for (let i = 0; i < 800; i++) {
+    let t = Math.random() * Math.PI * 2;
+    let point = heartShape(t, heartScale);
+    heartStars.push({
+      x: width / 2 + point.x,
+      y: height / 2 + point.y,
+      r: 2.5,
+      alpha: Math.random()
+    });
+  }
+}
+
+// Tạo chữ "Love you" rơi
+function createFallingText() {
+  fallingTexts.push({
+    x: Math.random() * width,
+    y: -30,
+    speed: 1 + Math.random() * 1.5,
+    size: 16 + Math.random() * 10,
+    alpha: 1
+  });
+}
+
+// Vẽ sao nền
+function drawStars() {
+  ctx.fillStyle = "white";
+  stars.forEach(s => {
+    ctx.globalAlpha = s.alpha;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // cập nhật alpha để nhấp nháy
+    s.alpha += s.speed;
+    if (s.alpha > 1 || s.alpha < 0.2) {
+      s.speed *= -1; // đổi chiều sáng - tối
+    }
+  });
+}
+
+// Vẽ trái tim
+function drawHeart() {
+  heartStars.forEach(s => {
+    ctx.beginPath();
+    ctx.globalAlpha = s.alpha;
+    ctx.fillStyle = "pink";
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+    s.alpha += (Math.random() - 0.5) * 0.1;
+    if (s.alpha < 0.1) s.alpha = 0.1;
+    if (s.alpha > 1) s.alpha = 1;
+  });
+}
+
+// Vẽ chữ rơi
+function drawFallingText() {
+  fallingTexts.forEach((t, i) => {
+    ctx.globalAlpha = t.alpha;
+    ctx.font = `bold ${t.size}px Arial`;
+    ctx.fillStyle = "red";
+    ctx.fillText("Love You!", t.x, t.y);
+    t.y += t.speed;
+    t.alpha -= 0.001;
+    if (t.y > height || t.alpha <= 0) {
+      fallingTexts.splice(i, 1);
+    }
+  });
+}
+
+// Animation loop
+function animate() {
+  ctx.clearRect(0, 0, width, height);
+  drawStars();
+  drawHeart();
+  drawFallingText();
+  requestAnimationFrame(animate);
+}
+
+// Lắng nghe resize
+window.addEventListener("resize", resizeCanvas);
+
+// Bắt đầu
+resizeCanvas();
+setInterval(createFallingText, 500);
+animate();
+</script>
+</body>
+</html>
