@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>Heart space</title>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Great+Vibes&family=Sacramento&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/616/616408.png">
   <style>
     body {
       margin: 0;
       overflow: hidden;
-      background: rgb(7, 0, 37);
+      background: rgb(5, 0, 34);
     }
     canvas {
       display: block;
@@ -110,7 +112,7 @@ function drawHeart() {
 function drawFallingText() {
   fallingTexts.forEach((t, i) => {
     ctx.globalAlpha = t.alpha;
-    ctx.font = `bold ${t.size}px Arial`;
+    ctx.font = `bold ${t.size}px "Allura", "Great Vibes", "Sacramento", cursive`;
     ctx.fillStyle = "red";
     ctx.fillText("Love You!", t.x, t.y);
     t.y += t.speed;
@@ -140,6 +142,7 @@ animate();
 </script>
 </body>
 </html>
+
 
 
 
